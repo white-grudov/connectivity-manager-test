@@ -11,6 +11,8 @@ import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Html;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
@@ -20,9 +22,9 @@ import java.net.SocketAddress;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String ADDRESS = "google.com";
-
     private TextView networkInfoTextView;
+    private EditText addressInput;
+    private String address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +32,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         networkInfoTextView = findViewById(R.id.network_info_text_view);
+        addressInput = findViewById(R.id.address_input);
+        Button startButton = findViewById(R.id.start_button);
 
         // Allow network operations on the main thread for simplicity
         // In production code, use an AsyncTask or similar background thread mechanism
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        displayNetworkInfo();
+        startButton.setOnClickListener(v -> {
+            address = addressInput.getText().toString().trim();
+            if (!address.isEmpty()) {
+                displayNetworkInfo();
+            } else {
+                Toast.makeText(MainActivity.this, "Please enter a valid address", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         networkInfoTextView.setOnLongClickListener(v -> {
             copyTextToClipboard();
@@ -62,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     info.append("<b>Link Properties:</b> ").append(linkProperties).append("<br>");
 
                     boolean canAccessAddress = canAccessAddress(network);
-                    info.append("<b>Can access " + ADDRESS + ":</b> ").append(canAccessAddress).append("<br><br>");
+                    info.append("<b>Can access ").append(address).append(":</b> ").append(canAccessAddress).append("<br><br>");
                 }
             }
         }
@@ -74,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         Socket socket = null;
         try {
             socket = network.getSocketFactory().createSocket();
-            SocketAddress socketAddress = new InetSocketAddress(MainActivity.ADDRESS, 80);
+            SocketAddress socketAddress = new InetSocketAddress(address, 80);
             socket.connect(socketAddress, 5000); // 5 seconds timeout
             return true;
         } catch (IOException e) {

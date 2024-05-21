@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">connectivity-manager-test</string>
+    <string name="network_info_will_be_displayed_here">Network Info will be displayed here</string>
+    <string name="check_connectivity">Check Connectivity</string>
+    <string name="enter_address">Enter address</string>
 </resources>
